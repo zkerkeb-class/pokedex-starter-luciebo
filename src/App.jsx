@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState } from 'react';
+import './App.css';
+import Header from './components/header';
+import Page2 from './components/pages/Page2';  // Import de la nouvelle page
+import Page1 from './components/pages/Page1';
+import PokemonCard from './components/pokemonCard/PokemonCard';
+import pokemonsList from './assets/pokemons';
+import SearchBar from './components/searchBar';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [search, setSearch] = useState("");
+  const[selectedType, setSelectedType] = useState("");
+  
+  useEffect(() => {
+    console.log(search);
+  }, [search]);
 
   return (
-    <>
+    <Router> 
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        
+        <div>
+          <Header />
+        </div>
+        <div className="search-bar-container">
+          <SearchBar search={search} setSearch={setSearch} />
+        </div>
+
+      <div id="cartes">
+        {pokemonsList.map((pokemon) => (
+          if(!pokemon.name.french.includes(search) || !selectedType.every(type => pokemon.type.includes(type))) {
+            return null
+          }
+          return (
+            <PokemonCard
+              key={pokemon.id}
+              name={pokemon.name.english}
+              image={`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${String(pokemon.id).padStart(3, '0')}.png`}
+              types={pokemon.type}
+              attack={pokemon.base.Attack}
+              defense={pokemon.base.Defense}
+              hp={pokemon.base.HP}
+            />
+        )))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <Link to="/Page2">
+        <button>Aller à la deuxième page</button>
+      </Link>
+      <Link to="/Page1">
+        <button>Aller à la première page</button>
+      </Link>
+
+      {/* Définition des routes */}
+      <Routes>
+        <Route path="/Page2" element={<Page2 />} />
+        <Route path="/Page1" element={<Page1 />} />
+      </Routes>
+
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+    </Router>
+  );
 }
 
-export default App
+export default App;
